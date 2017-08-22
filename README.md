@@ -1,6 +1,6 @@
 # hass-variables
 
-A Home Assistant component to declare and set variables.
+A Home Assistant component to declare and set/update variables (state).
 
 ## Install
 Copy variables.py to your home-assistant custom_components folder
@@ -84,7 +84,6 @@ automation:
       - service: variables.set_variable
         data:
           variable: countdown_timer
-          attributes_template: '{ "previous_value": {{(float(variable.state)) | int }} }'
           value_template: '{{(float(variable.state) - 1 ) | int }}'
 
   - alias: variable_trigger
