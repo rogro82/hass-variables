@@ -41,18 +41,17 @@ def setup(hass, config):
         replace_attributes = call.data.get(ATTR_REPLACE_ATTRIBUTES, False)
 
         current_state = hass.states.get(DOMAIN + '.' + variable)
-        current_attributes = None
 
         new_attributes = None
         new_value = None
 
         if not replace_attributes:
             if current_state is not None:
-                current_attributes = current_state.attributes
+                if isinstance(current_state.attributes, dict):
+                    new_attributes = dict(current_state.attributes)
 
         if attributes is not None:
-            if current_attributes is not None:
-                new_attributes = dict(current_attributes)
+            if new_attributes is not None:
                 new_attributes.update(attributes)
             else:
                 new_attributes = attributes
@@ -62,14 +61,10 @@ def setup(hass, config):
             attributes = json.loads(attributes_template.render({'variable': current_state}))
 
             if isinstance(attributes, dict):
-                if current_attributes is not None:
-                    new_attributes = dict(current_attributes)
+                if new_attributes is not None:
                     new_attributes.update(attributes)
                 else:
                     new_attributes = attributes
-
-        else:
-            new_attributes = current_attributes
 
         if value is not None:
             new_value = value
