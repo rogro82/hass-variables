@@ -47,7 +47,7 @@ def setup(hass, config):
 
         if not replace_attributes:
             if current_state is not None:
-                if isinstance(current_state.attributes, dict):
+                if current_state.attributes is not None:
                     new_attributes = dict(current_state.attributes)
 
         if attributes is not None:
