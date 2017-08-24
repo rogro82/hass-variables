@@ -1,0 +1,17 @@
+variable:
+  test_counter:
+    value: 0
+    attributes:
+      icon: mdi:alarm
+
+automation:
+  - alias: test_counter
+    initial_state: 'on'
+    trigger:
+      - platform: time
+        seconds: '/1'
+    action:
+      - service: variable.set_variable
+        data:
+          variable: test_counter
+          value_template: '{{ (variable.state | int) + 1 }}'

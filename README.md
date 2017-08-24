@@ -3,27 +3,36 @@
 A Home Assistant component to declare and set/update variables (state).
 
 ## Install
-Copy variables.py to your home-assistant custom_components folder
+Copy variable.py to your home-assistant custom_components folder
 
 ## Configure
-Add the component variables to your configuration and declare the variables you want.
+Add the component `variable` to your configuration and declare the variables you want.
 
 ### Example configuration:
-```
-variables:
+```yaml
+variable:
   countdown_timer:
     value: 30
     attributes:
       friendly_name: 'Countdown'
       icon: mdi:alarm
   countdown_trigger:
+    name: Countdown
     value: False
+  light_scene:
+    value: 'normal'
+    attributes:
+      previous: ''
+    restore: true
 ```
-A variable 'should' have a value and can optionally have attributes, which can be used to specify additional values but can also be used to set internal attributes like icon, friendly_name etc.
+
+A variable 'should' have a __value__ and can optionally have a __name__ and __attributes__, which can be used to specify additional values but can also be used to set internal attributes like icon, friendly_name etc.
+
+In case you want your variable to restore its value after restarting you can set __restore__ to true.
 
 ## Set variables from automations
 
-To update a variables value and/or attributes you can use the service call `variables.set_variable`
+To update a variables value and/or its attributes you can use the service call `variable.set_variable`
 
 The following parameters can be used with this service:
 
@@ -32,68 +41,77 @@ The name of the variable to update
 - __value: any (optional)__
 New value to set
 - __value_template: template (optional)__
-New value to set from template
+New value to set from a template
 - __attributes: dictionary (optional)__
 Attributes to set or update
 - __attributes_template: template (optional)__
-Attributes to set or update from template
-- __replace_attributes: boolean (optional)__
-Replace or merge current attributes (default false=merge)
+Attributes to set or update from a template ( should return a json object )
+- __replace_attributes: boolean ( optional )__
+Replace or merge current attributes (default false = merge)
 
 ### Example service calls
 
-```
+```yaml
 action:
-  - service: variables.set_variable
+  - service: variable.set_variable
     data:
-      variable: countdown_timer
+      variable: test_timer
       value: 30
 
 action:
-  - service: variables.set_variable
+  - service: variable.set_variable
     data:
-      variable: countdown_timer
-      attributes_template: '{ "previous_value": {{(float(variable.state)) | int }} }'
-      value_template: '{{(float(variable.state) - 1 ) | int }}'
+      variable: last_motion
+      value: "livingroom"
+      attributes_template: >
+        {
+          "history_1": "{{ variable.state }}",
+          "history_2": "{{ variable.attributes.history_1 }}",
+          "history_3": "{{ variable.attributes.history_2 }}"
+        }
 ```
 
 ### Example timer automation
 
-```
-variables:
-  countdown_timer:
-    value: 30
+```yaml
+variable:
+  test_timer:
+    value: 0
     attributes:
-      friendly_name: 'Countdown'
       icon: mdi:alarm
-  countdown_trigger:
-    value: False
-    attributes:
-      friendly_name: 'Trigger'
+
+script:
+  schedule_test_timer:
+    sequence:
+      - service: variable.set_variable
+        data:
+          variable: test_timer
+          value: 30
+      - service: automation.turn_on
+        data:
+          entity_id: automation.test_timer_countdown
 
 automation:
-  - alias: timer
+  - alias: test_timer_countdown
+    initial_state: 'off'
     trigger:
       - platform: time
         seconds: '/1'
-    condition:
-      condition: numeric_state
-      entity_id: variables.countdown_timer
-      above: 0
     action:
-      - service: variables.set_variable
+      - service: variable.set_variable
         data:
-          variable: countdown_timer
-          value_template: '{{(float(variable.state) - 1 ) | int }}'
+          variable: test_timer
+          value_template: '{{ [((variable.state | int) - 1), 0] | max }}'
 
-  - alias: variable_trigger
+  - alias: test_timer_trigger
     trigger:
       platform: state
-      entity_id: variables.countdown_timer
+      entity_id: variable.test_timer
       to: '0'
     action:
-      - service: variables.set_variable
+      - service: automation.turn_off
         data:
-          variable: countdown_trigger
-          value: true
+          entity_id: automation.test_timer_countdown
 ```
+
+More examples can be found in the examples folder.

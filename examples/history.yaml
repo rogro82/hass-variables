@@ -1,0 +1,43 @@
+variable:
+  last_motion:
+    value: 'unknown'
+    restore: true
+
+script:
+  update_last_motion:
+    sequence:
+      - service: variable.set_variable
+        data:
+          variable: last_motion
+          attributes_template: >
+            {
+              "history_1": "{{ variable.state }}",
+              "history_2": "{{ variable.attributes.history_1 }}",
+              "history_3": "{{ variable.attributes.history_2 }}"
+            }
+        data_template:
+          value: "{{ location }}"
+
+  update_motion_hall:
+    sequence:
+      - service: script.update_last_motion
+        data:
+          location: 'hall'
+
+  update_motion_livingroom:
+    sequence:
+      - service: script.update_last_motion
+        data:
+          location: 'livingroom'
+
+  update_motion_toilet:
+    sequence:
+      - service: script.update_last_motion
+        data:
+          location: 'toilet'
+
+  update_motion_bedroom:
+    sequence:
+      - service: script.update_last_motion
+        data:
+          location: 'bedroom'

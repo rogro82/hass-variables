@@ -1,0 +1,97 @@
+variable:
+  keypad:
+    value: ''
+    attributes:
+      icon: mdi:gesture-tap
+  keypad_timer:
+    value: 0
+    attributes:
+      icon: mdi:alarm
+
+input_boolean:
+  keypad_toggle:
+
+script:
+  update_keypad:
+    sequence:
+      - service: variable.set_variable
+        data_template:
+          variable: keypad
+          attributes:
+            last: "{{ number }}"
+      - service: variable.set_variable
+        data:
+          variable: keypad
+          value_template: '{{ variable.state }}{{ variable.attributes.last }}'
+      - service: variable.set_variable
+        data:
+          variable: keypad_timer
+          value: 10
+      - service: automation.turn_on
+        data:
+          entity_id: automation.keypad_timer
+
+  clear_keypad:
+    sequence:
+      - service: variable.set_variable
+        data:
+          variable: keypad
+          value: ''
+
+  enter_keypad_1:
+    sequence:
+      - service: script.update_keypad
+        data:
+          number: 1
+
+  enter_keypad_2:
+    sequence:
+      - service: script.update_keypad
+        data:
+          number: 2
+
+  enter_keypad_3:
+    sequence:
+      - service: script.update_keypad
+        data:
+          number: 3
+
+  enter_keypad_4:
+    sequence:
+      - service: script.update_keypad
+        data:
+          number: 4
+
+automation:
+  - alias: keypad_timer
+    initial_state: 'off'
+    trigger:
+      - platform: time
+        seconds: '/1'
+    action:
+      - service: variable.set_variable
+        data:
+          variable: keypad_timer
+          value_template: '{{ [((variable.state | int) - 1), 0] | max }}'
+
+  - alias: keypad_timeout
+    trigger:
+      platform: state
+      entity_id: variable.keypad_timer
+      to: '0'
+    action:
+      - service: script.clear_keypad
+      - service: automation.turn_off
+        data:
+          entity_id: automation.keypad_timer
+
+  - alias: keypad_validate
+    trigger:
+      platform: state
+      entity_id: variable.keypad
+      to: '1234'
+    action:
+      - service: input_boolean.toggle
+        data:
+          entity_id: input_boolean.keypad_toggle
+      - service: script.clear_keypad
