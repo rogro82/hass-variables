@@ -62,8 +62,7 @@ def set_variable(hass, variable, value, value_template, attributes, attributes_t
         ATTR_REPLACE_ATTRIBUTES: replace_attributes,
     })
 
-@asyncio.coroutine
-def async_setup(hass, config):
+async def async_setup(hass, config):
     """Set up variables."""
     component = EntityComponent(_LOGGER, DOMAIN, hass)
 
@@ -106,7 +105,7 @@ def async_setup(hass, config):
         DOMAIN, SERVICE_SET_VARIABLE, async_set_variable_service,
         schema=SERVICE_SET_VARIABLE_SCHEMA)
 
-    yield from component.async_add_entities(entities)
+    await component.async_add_entities(entities)
     return True
 
 class Variable(RestoreEntity):
@@ -120,12 +119,11 @@ class Variable(RestoreEntity):
         self._attributes = attributes
         self._restore = restore
 
-    @asyncio.coroutine
-    def async_added_to_hass(self):
+    async def async_added_to_hass(self):
         """Run when entity about to be added."""
-        super().async_added_to_hass()
+        await super().async_added_to_hass()
         if self._restore == True:
-            state = yield from self.async_get_last_state()
+            state = await self.async_get_last_state()
             if state:
                 self._value = state.state
 
