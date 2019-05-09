@@ -19,7 +19,7 @@ automation:
   - alias: test_timer_countdown
     initial_state: 'off'
     trigger:
-      - platform: time
+      - platform: time_pattern
         seconds: '/1'
     action:
       - service: variable.set_variable
