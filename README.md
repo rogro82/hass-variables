@@ -3,12 +3,26 @@
 A Home Assistant component to declare and set/update variables (state).
 
 ## Install
-Copy variable.py to your home-assistant custom_components folder
+
+### Manualy
+
+Copy `variable` folder in to your home-assistant `custom_components` folder
+
+### Automaticaly with HACS
+
+In HACS settings, add a custom repository with:
+
+- URL: `https://github.com/rogro82/hass-variables`
+- type: `integration`
+
+Then the `variable` custom component will be installable through HACS and you will be able to follow the future updates.
 
 ## Configure
+
 Add the component `variable` to your configuration and declare the variables you want.
 
-### Example configuration:
+### Example configuration
+
 ```yaml
 variable:
   countdown_timer:
@@ -28,7 +42,7 @@ variable:
 
 A variable 'should' have a __value__ and can optionally have a __name__ and __attributes__, which can be used to specify additional values but can also be used to set internal attributes like icon, friendly_name etc.
 
-In case you want your variable to restore its value after restarting you can set __restore__ to true.
+In case you want your variable to restore its value and attributes after restarting you can set __restore__ to true.
 
 ## Set variables from automations
 
