@@ -1,0 +1,24 @@
+- id: posta_state_change
+  alias: 'Posta state change'
+  hide_entity: true
+  initial_state: 'true'
+  trigger:
+    platform: state
+    entity_id: sensor.cp_packages_coming_today
+  condition:
+    condition: state
+    entity_id: 'sensor.cp_packages_coming_today'
+    state: 'Delivery'
+  action:
+    service: variable.set_variable
+    data:
+      variable: posta_variable
+      attributes_template: >
+        {
+          "from": "{{ state_attr('sensor.cp_packages_coming_today', 'from') }}",
+          "date": "{{ state_attr('sensor.cp_packages_coming_today', 'date') }}",
+          "subject": "{{ state_attr('sensor.cp_packages_coming_today', 'subject') }}"
+        }
+    data_template:
+      value: >
+          {{ states('sensor.cp_packages_coming_today')}}
