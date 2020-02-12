@@ -20,6 +20,7 @@ ENTITY_ID_FORMAT = DOMAIN + ".{}"
 CONF_ATTRIBUTES = "attributes"
 CONF_VALUE = "value"
 CONF_RESTORE = "restore"
+CONF_FORCE_UPDATE = "force_update"
 
 ATTR_VARIABLE = "variable"
 ATTR_VALUE = "value"
@@ -50,6 +51,7 @@ CONFIG_SCHEMA = vol.Schema(
                         vol.Optional(CONF_VALUE): cv.match_all,
                         vol.Optional(CONF_ATTRIBUTES): dict,
                         vol.Optional(CONF_RESTORE): cv.boolean,
+                        vol.Optional(CONF_FORCE_UPDATE): cv.boolean,
                     },
                     None,
                 )
@@ -99,9 +101,10 @@ async def async_setup(hass, config):
         value = variable_config.get(CONF_VALUE)
         attributes = variable_config.get(CONF_ATTRIBUTES)
         restore = variable_config.get(CONF_RESTORE, False)
+        force_update = variable_config.get(CONF_FORCE_UPDATE, False)
 
         entities.append(
-            Variable(variable_id, name, value, attributes, restore)
+            Variable(variable_id, name, value, attributes, restore, force_update)
         )
 
     @asyncio.coroutine
@@ -142,13 +145,14 @@ async def async_setup(hass, config):
 class Variable(RestoreEntity):
     """Representation of a variable."""
 
-    def __init__(self, variable_id, name, value, attributes, restore):
+    def __init__(self, variable_id, name, value, attributes, restore, force_update):
         """Initialize a variable."""
         self.entity_id = ENTITY_ID_FORMAT.format(variable_id)
         self._name = name
         self._value = value
         self._attributes = attributes
         self._restore = restore
+        self._force_update = force_update
 
     async def async_added_to_hass(self):
         """Run when entity about to be added."""
@@ -188,6 +192,10 @@ class Variable(RestoreEntity):
     def state_attributes(self):
         """Return the state attributes."""
         return self._attributes
+
+    @property
+    def force_update(self) -> bool:
+        return self._force_update
 
     @asyncio.coroutine
     def async_set_variable(
