@@ -39,7 +39,7 @@ variable:
       previous: ''
     restore: true
   current_power_usage:
-    force_update: True
+    force_update: true
 ```
 
 A variable 'should' have a __value__ and can optionally have a __name__ and __attributes__, which can be used to specify additional values but can also be used to set internal attributes like icon, friendly_name etc.
