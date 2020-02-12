@@ -38,11 +38,15 @@ variable:
     attributes:
       previous: ''
     restore: true
+  current_power_usage:
+    force_update: True
 ```
 
 A variable 'should' have a __value__ and can optionally have a __name__ and __attributes__, which can be used to specify additional values but can also be used to set internal attributes like icon, friendly_name etc.
 
 In case you want your variable to restore its value and attributes after restarting you can set __restore__ to true.
+
+In case you want your variable to update (and add an history entry) even if the value has not changed, you can set __force_update__ to true.
 
 ## Set variables from automations
 
