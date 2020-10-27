@@ -2,6 +2,7 @@
     "domain": "variable",
     "name": "variable",
     "documentation": "https://github.com/Wibias/hass-variables",
+    "issue_tracker": "https://github.com/Wibias/hass-variables/issues",
     "requirements": [],
     "dependencies": [],
     "codeowners": [
