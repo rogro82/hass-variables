@@ -1,10 +1,11 @@
 {
     "domain": "variable",
     "name": "variable",
-    "documentation": "https://github.com/rogro82/hass-variables",
+    "documentation": "https://github.com/Wibias/hass-variables",
     "requirements": [],
     "dependencies": [],
     "codeowners": [
         "@rogro82"
+        "@wibias"
     ]
 }
