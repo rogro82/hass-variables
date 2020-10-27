@@ -15,14 +15,14 @@ script:
   update_keypad:
     sequence:
       - service: variable.set_variable
-        data_template:
+        data:
           variable: keypad
           attributes:
             last: "{{ number }}"
       - service: variable.set_variable
         data:
           variable: keypad
-          value_template: '{{ variable.state }}{{ variable.attributes.last }}'
+          value: '{{ variable.state }}{{ variable.attributes.last }}'
       - service: variable.set_variable
         data:
           variable: keypad_timer
@@ -72,7 +72,7 @@ automation:
       - service: variable.set_variable
         data:
           variable: keypad_timer
-          value_template: '{{ [((variable.state | int) - 1), 0] | max }}'
+          value: '{{ [((variable.state | int) - 1), 0] | max }}'
 
   - alias: keypad_timeout
     trigger:

@@ -9,13 +9,13 @@ script:
       - service: variable.set_variable
         data:
           variable: last_motion
-          attributes_template: >
+          attributes: >
             {
               "history_1": "{{ variable.state }}",
               "history_2": "{{ variable.attributes.history_1 }}",
               "history_3": "{{ variable.attributes.history_2 }}"
             }
-        data_template:
+        data:
           value: "{{ location }}"
 
   update_motion_hall:

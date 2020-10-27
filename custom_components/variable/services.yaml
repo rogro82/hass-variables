@@ -10,12 +10,8 @@ set_variable:
       description: string (required) The name of the variable to update
     value:
       description: any (optional) New value to set
-    value_template:
-      description: template (optional) New value to set from a template
     attributes:
       description: dictionary (optional) Attributes to set or update
-    attributes_template:
-      description: template (optional) Attributes to set or update from a template ( should return a json object )
     replace_attributes:
       description: boolean ( optional ) Replace or merge current attributes (default false = merge)
 

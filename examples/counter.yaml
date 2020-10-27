@@ -14,4 +14,4 @@ automation:
       - service: variable.set_variable
         data:
           variable: test_counter
-          value_template: '{{ (variable.state | int) + 1 }}'
+          value: '{{ (variable.state | int) + 1 }}'

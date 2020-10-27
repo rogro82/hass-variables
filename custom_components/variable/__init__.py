@@ -1,4 +1,4 @@
-"""variable implementation for Homme Assistant."""
+"""variable implementation for Home Assistant."""
 import asyncio
 import logging
 import json
@@ -7,7 +7,6 @@ import voluptuous as vol
 
 from homeassistant.const import CONF_NAME, ATTR_ICON
 from homeassistant.helpers import config_validation as cv
-from homeassistant.exceptions import TemplateError
 from homeassistant.loader import bind_hass
 from homeassistant.helpers.entity_component import EntityComponent
 from homeassistant.helpers.restore_state import RestoreEntity
@@ -20,12 +19,11 @@ ENTITY_ID_FORMAT = DOMAIN + ".{}"
 CONF_ATTRIBUTES = "attributes"
 CONF_VALUE = "value"
 CONF_RESTORE = "restore"
+CONF_FORCE_UPDATE = "force_update"
 
 ATTR_VARIABLE = "variable"
 ATTR_VALUE = "value"
-ATTR_VALUE_TEMPLATE = "value_template"
 ATTR_ATTRIBUTES = "attributes"
-ATTR_ATTRIBUTES_TEMPLATE = "attributes_template"
 ATTR_REPLACE_ATTRIBUTES = "replace_attributes"
 
 SERVICE_SET_VARIABLE = "set_variable"
@@ -33,9 +31,7 @@ SERVICE_SET_VARIABLE_SCHEMA = vol.Schema(
     {
         vol.Required(ATTR_VARIABLE): cv.string,
         vol.Optional(ATTR_VALUE): cv.match_all,
-        vol.Optional(ATTR_VALUE_TEMPLATE): cv.template,
         vol.Optional(ATTR_ATTRIBUTES): dict,
-        vol.Optional(ATTR_ATTRIBUTES_TEMPLATE): cv.template,
         vol.Optional(ATTR_REPLACE_ATTRIBUTES): cv.boolean,
     }
 )
@@ -50,6 +46,7 @@ CONFIG_SCHEMA = vol.Schema(
                         vol.Optional(CONF_VALUE): cv.match_all,
                         vol.Optional(CONF_ATTRIBUTES): dict,
                         vol.Optional(CONF_RESTORE): cv.boolean,
+                        vol.Optional(CONF_FORCE_UPDATE): cv.boolean,
                     },
                     None,
                 )
@@ -65,9 +62,7 @@ def set_variable(
     hass,
     variable,
     value,
-    value_template,
     attributes,
-    attributes_template,
     replace_attributes,
 ):
     """Set input_boolean to True."""
@@ -77,9 +72,7 @@ def set_variable(
         {
             ATTR_VARIABLE: variable,
             ATTR_VALUE: value,
-            ATTR_VALUE_TEMPLATE: value_template,
             ATTR_ATTRIBUTES: attributes,
-            ATTR_ATTRIBUTES_TEMPLATE: attributes_template,
             ATTR_REPLACE_ATTRIBUTES: replace_attributes,
         },
     )
@@ -99,9 +92,10 @@ async def async_setup(hass, config):
         value = variable_config.get(CONF_VALUE)
         attributes = variable_config.get(CONF_ATTRIBUTES)
         restore = variable_config.get(CONF_RESTORE, False)
+        force_update = variable_config.get(CONF_FORCE_UPDATE, False)
 
         entities.append(
-            Variable(variable_id, name, value, attributes, restore)
+            Variable(variable_id, name, value, attributes, restore, force_update)
         )
 
     @asyncio.coroutine
@@ -115,9 +109,7 @@ async def async_setup(hass, config):
             tasks = [
                 variable.async_set_variable(
                     call.data.get(ATTR_VALUE),
-                    call.data.get(ATTR_VALUE_TEMPLATE),
                     call.data.get(ATTR_ATTRIBUTES),
-                    call.data.get(ATTR_ATTRIBUTES_TEMPLATE),
                     call.data.get(ATTR_REPLACE_ATTRIBUTES, False),
                 )
                 for variable in target_variables
@@ -142,13 +134,14 @@ async def async_setup(hass, config):
 class Variable(RestoreEntity):
     """Representation of a variable."""
 
-    def __init__(self, variable_id, name, value, attributes, restore):
+    def __init__(self, variable_id, name, value, attributes, restore, force_update):
         """Initialize a variable."""
         self.entity_id = ENTITY_ID_FORMAT.format(variable_id)
         self._name = name
         self._value = value
         self._attributes = attributes
         self._restore = restore
+        self._force_update = force_update
 
     async def async_added_to_hass(self):
         """Run when entity about to be added."""
@@ -189,13 +182,18 @@ class Variable(RestoreEntity):
         """Return the state attributes."""
         return self._attributes
 
+    @property
+    def force_update(self) -> bool:
+        """Force update"""
+        return self._force_update
+
+
+
     @asyncio.coroutine
     def async_set_variable(
         self,
         value,
-        value_template,
         attributes,
-        attributes_template,
         replace_attributes,
     ):
         """Update variable."""
@@ -212,42 +210,8 @@ class Variable(RestoreEntity):
             else:
                 updated_attributes = attributes
 
-        elif attributes_template is not None:
-            attributes_template.hass = self.hass
-
-            try:
-                attributes = attributes_template.async_render(
-                        {"variable": current_state}
-                )
-
-                if isinstance(attributes, dict):
-                    if updated_attributes is not None:
-                        updated_attributes.update(attributes)
-                    else:
-                        updated_attributes = attributes
-
-            except TemplateError as ex:
-                _LOGGER.error(
-                    "Could not render attribute_template %s: %s",
-                    self.entity_id,
-                    ex,
-                )
-
         if value is not None:
             updated_value = value
-
-        elif value_template is not None:
-            try:
-                value_template.hass = self.hass
-                updated_value = value_template.async_render(
-                    {"variable": current_state}
-                )
-            except TemplateError as ex:
-                _LOGGER.error(
-                    "Could not render value_template %s: %s",
-                    self.entity_id,
-                    ex,
-                )
 
         self._attributes = updated_attributes
 
