@@ -14,7 +14,7 @@ Copy `variable` folder in to your home-assistant `custom_components` folder
 
 In HACS settings, add a custom repository with:
 
-- URL: `https://github.com/rogro82/hass-variables`
+- URL: `https://github.com/wibias/hass-variables`
 - type: `integration`
 
 Then the `variable` custom component will be installable through HACS and you will be able to follow the future updates.
