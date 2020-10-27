@@ -88,12 +88,10 @@ action:
     data:
       variable: last_motion
       value: "livingroom"
-      attributes: >
-        {
-          "history_1": "{{ variable.state }}",
-          "history_2": "{{ variable.attributes.history_1 }}",
-          "history_3": "{{ variable.attributes.history_2 }}"
-        }
+      attributes:
+          history_1: "{{states('variable.last_motion')}}"
+          history_2: "{{state_attr('variable.last_motion','history_1')}}"
+          history_3: "{{state_attr('variable.last_motion','history_2')}}"
 ```
 
 ### Example timer automation

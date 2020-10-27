@@ -13,12 +13,10 @@
     service: variable.set_variable
     data:
       variable: posta_variable
-      attributes: >
-        {
-          "from": "{{ state_attr('sensor.cp_packages_coming_today', 'from') }}",
-          "date": "{{ state_attr('sensor.cp_packages_coming_today', 'date') }}",
-          "subject": "{{ state_attr('sensor.cp_packages_coming_today', 'subject') }}"
-        }
+      attributes:
+          from: "{{ state_attr('sensor.cp_packages_coming_today', 'from') }}",
+          date: "{{ state_attr('sensor.cp_packages_coming_today', 'date') }}",
+          subject: "{{ state_attr('sensor.cp_packages_coming_today', 'subject') }}"
     data:
       value: >
           {{ states('sensor.cp_packages_coming_today')}}
