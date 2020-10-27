@@ -2,15 +2,15 @@
 
 A Home Assistant component to declare and set/update variables (state).
 
-Since rogro82 seems to have abandoned his repository and his custom_component is really usefull I just forked it and updated it so it's still works with 0.117!
+Since rogro82 seems to have abandoned his repository and his custom_component is really useful I just forked it and updated it so it's still works with 0.117!
 
 ## Install
 
-### Manualy
+### Manually
 
 Copy `variable` folder in to your home-assistant `custom_components` folder
 
-### Automaticaly with HACS
+### Automatically with HACS
 
 *This card is available in [HACS](https://github.com/custom-components/hacs) (Home Assistant Community Store)*
 
@@ -48,7 +48,7 @@ A variable 'should' have a __value__ and can optionally have a __name__ and __at
 
 In case you want your variable to restore its value and attributes after restarting you can set __restore__ to true.
 
-In case you want your variable to update (and add an history entry) even if the value has not changed, you can set __force_update__ to true.
+In case you want your variable to update (and add a history entry) even if the value has not changed, you can set __force_update__ to true.
 
 ## Set variables from automations
 
