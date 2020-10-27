@@ -54,12 +54,8 @@ The following parameters can be used with this service:
 The name of the variable to update
 - __value: any (optional)__
 New value to set
-- __value_template: template (optional)__
-New value to set from a template
 - __attributes: dictionary (optional)__
 Attributes to set or update
-- __attributes_template: template (optional)__
-Attributes to set or update from a template ( should return a json object )
 - __replace_attributes: boolean ( optional )__
 Replace or merge current attributes (default false = merge)
 
@@ -77,7 +73,7 @@ action:
     data:
       variable: last_motion
       value: "livingroom"
-      attributes_template: >
+      attributes: >
         {
           "history_1": "{{ variable.state }}",
           "history_2": "{{ variable.attributes.history_1 }}",
@@ -115,7 +111,7 @@ automation:
       - service: variable.set_variable
         data:
           variable: test_timer
-          value_template: '{{ [((variable.state | int) - 1), 0] | max }}'
+          value: '{{ [((variable.state | int) - 1), 0] | max }}'
 
   - alias: test_timer_trigger
     trigger:

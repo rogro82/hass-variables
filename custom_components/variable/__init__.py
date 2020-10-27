@@ -216,10 +216,8 @@ class Variable(RestoreEntity):
             attributes_template.hass = self.hass
 
             try:
-                attributes = json.loads(
-                    attributes_template.async_render(
+                attributes = attributes_template.async_render(
                         {"variable": current_state}
-                    )
                 )
 
                 if isinstance(attributes, dict):
