@@ -2,6 +2,7 @@
     "domain": "variable",
     "name": "variable",
     "documentation": "https://github.com/rogro82/hass-variables",
+    "version": "0.11",
     "requirements": [],
     "dependencies": [],
     "codeowners": [
